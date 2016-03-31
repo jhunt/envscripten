@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+if [[ ${1} == "init" ]]; then
+	echo "entering initial setup"
+	case $OSTYPE in
+	(darwin*)
+		echo "running on a mac..."
+		;;
+	(linux*)
+		echo "running on a linux..."
+		DIST=$(lsb_release -si)
+		case ${DIST} in
+		(Ubuntu)
+			echo "ensuring required system packages are present..."
+			sudo apt-get update >/dev/null
+			sudo apt-get install -y >/dev/null \
+				$(cat ~/env/pkg/ubuntu 2>/dev/null)
+			;;
+		esac
+		;;
+	(*)
+		echo "*** UNRECOGNIZED SYSTEM (OSTYPE) FOUND: ${OSTYPE} ***"
+		;;
+	esac
+fi
+
+echo "setting up dot files in ~"
+(
+cd ~/env/dot
+for FILE in *; do
+	cp $FILE ~/.$FILE
+done
+)
+
+echo "configuring vim..."
+mkdir -p ~/.vim
+rsync -a vim/ ~/.vim/
+
+echo "copying in ~/bin scripts..."
+mkdir -p ~/bin ~/sw
+cp ~/env/bin/* ~/bin
+
+echo "configuring git..."
+~/env/git-config
+
+echo "setting up ~/.bashrc..."
+touch ~/.bashrc
+grep -q "source $HOME/env/bashrc" ~/.bashrc || echo "source $HOME/env/bashrc" >> ~/.bashrc
+source ~/.bashrc
+if [[ ! -f ~/.bash_profile ]]; then
+	echo ". ~/.bashrc" > ~/.bash_profile
+fi
