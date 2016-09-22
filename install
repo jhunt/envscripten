@@ -34,16 +34,22 @@ for FILE in *; do
 done
 )
 
-echo "configuring vim..."
-mkdir -p ~/.vim
-rsync -a vim/ ~/.vim/
+if [[ -d vim ]]; then
+	echo "configuring vim..."
+	mkdir -p ~/.vim
+	rsync -a vim/ ~/.vim/
+fi
 
-echo "copying in ~/bin scripts..."
-mkdir -p ~/bin ~/sw
-cp ~/env/bin/* ~/bin
+if [[ -d bin ]]; then
+	echo "copying in ~/bin scripts..."
+	mkdir -p ~/bin ~/sw
+	cp ~/env/bin/* ~/bin
+fi
 
-echo "configuring git..."
-~/env/git-config
+if [[ -x ~/env/git-config ]]; then
+	echo "configuring git..."
+	~/env/git-config
+fi
 
 echo "setting up ~/.bashrc..."
 touch ~/.bashrc
