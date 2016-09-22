@@ -22,7 +22,10 @@ export V=0
 
 # Bash Prompts ########################################
 
-PROMPT_HOST=$(hostname -f)
+PROMPT_HOST=
+[ -f $HOME/.host  ] && PROMPT_HOST=$(cat $HOME/.host)
+[ -z $PROMPT_HOST ] && PROMPT_HOST=$(hostname -f)
+
 if [[ -x /sbin/ip ]]; then
 	PROMPT_ADDR=$(/sbin/ip addr show 2>/dev/null | awk '/inet.* scope global / { print $2; exit }')
 elif [[ -x /sbin/ifconfig ]]; then
@@ -87,6 +90,9 @@ done
 
 if [ -f ~/.bashrc.local ]; then
 	. ~/.bashrc.local
+fi
+if [ -f ~/.title ]; then
+	title $(cat ~/.title)
 fi
 
 eval $(dircolors 2>/dev/null)
